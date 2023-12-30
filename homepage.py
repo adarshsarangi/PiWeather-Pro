@@ -1,0 +1,120 @@
+html="""
+
+
+<!DOCTYPE html>
+<html lang="en">
+<head>
+	<base target="_top">
+	<meta charset="utf-8">
+	<meta name="viewport" content="width=device-width, initial-scale=1">
+	<title>PiWeather Pro</title>
+
+  <link rel="shortcut icon" type="image/x-icon" href="docs/images/favicon.ico" />
+  <link rel="stylesheet" href="https://unpkg.com/leaflet@1.9.4/dist/leaflet.css" integrity="sha256-p4NxAoJBhIIN+hmNHrzRCf9tD/miZyoHS5obTRR9BMY=" crossorigin=""/>
+  <script src="https://unpkg.com/leaflet@1.9.4/dist/leaflet.js" integrity="sha256-20nQCchB9co0qIjJZRGuk2/Z9VM+kNiyxNV1lvTlZBo=" crossorigin=""></script>
+	<style>
+		html, body {
+			height: 100%;
+			margin: 0;
+			text-align: center;
+			background-image: linear-gradient( 95.2deg, rgba(173,252,234,1) 26.8%, rgba(192,229,246,1) 64% );
+		}
+		.leaflet-container {
+			height: 400px;
+			width: 600px;
+			max-width: 100%;
+			max-height: 100%;
+		}
+		.container{
+			margin: 18px;
+			display: flex;
+			justify-content: center;
+		}
+		.btn{
+			text-align: center;
+			border-radius: 20px;
+			background: #2ecc71;
+  			color: #ffffff;
+			appearance: none;
+    		-webkit-appearance: none;
+  			font-family: sans-serif;
+  			cursor: pointer;
+  			padding: 12px;
+  			min-width: 100px;
+  			border: 0px;
+    		-webkit-transition: background-color 100ms linear;
+    		-ms-transition: background-color 100ms linear;
+     		transition: background-color 100ms linear;
+		}
+		.btn:hover{
+			background: #000;
+  			color: #ffffff;
+		}
+		#map{
+			width: 600px; 
+			height: 400px;
+			border-radius: 10px;
+		}
+	</style>
+
+</head>
+<body>
+	<div class = "heading">
+		<h1>
+			PiWeather Pro
+		</h1>
+	</div>
+	<div class="container">
+		<div id="map" ></div>
+	</div>
+	<form>
+		<button class = 'btn' onclick="fetchCoordinates()" >Fetch Weather for dropped pin</button>
+		<button class = 'btn' onclick="fetchLocal()" >Fetch Local Weather </button>
+	</form>
+	<div class="foot">
+		<p>Web-controller for Weather Station.</p> 
+		<p>Check for weather on lcd </p>
+	</div>
+<script>
+	const map = L.map('map').setView([51.505,-0.09],9);
+	const tiles = L.tileLayer('https://tile.openstreetmap.org/{z}/{x}/{y}.png', {
+		maxZoom: 19,
+		attribution: '&copy; <a href="http://www.openstreetmap.org/copyright">OpenStreetMap</a>'
+	}).addTo(map);
+
+	const popup = L.popup()
+		.setLatLng([28.6139, 77.2090])
+		.setContent('Fetching weather in this location')
+		.openOn(map);
+
+	function onMapClick(e) {
+		popup
+			.setLatLng(e.latlng)
+			.setContent(`Fetching weather of ${e.latlng.toString()}`)
+			.openOn(map);
+	}
+	map.on('click', onMapClick);
+	function fetchCoordinates() {
+		const center = map.getCenter();
+		const latitude = parseFloat(center.lat);
+		const longitude = parseFloat(center.lng);
+		const flatitude = latitude.toFixed(3)
+		const flongitude = longitude.toFixed(3)
+		var xhttp = new XMLHttpRequest();
+		xhttp.open('GET','/coord/'+flatitude+'/'+flongitude, true)
+		xhttp.send()
+		console.log(`Latitude: ${flatitude}, Longitude: ${flongitude}`);
+		event.preventDefault();
+	}
+	function fetchLocal(){
+		var xhttp = new XMLHttpRequest();
+		xhttp.open('GET',"/local/", true)
+		xhttp.send()
+		console.log("local data");
+		event.preventDefault();
+	}
+</script>
+</body>
+</html>
+
+"""
